@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>OrderCntr</title>
+    <link rel="stylesheet" type="text/css" href="../js/jquery-easyui-1.8.5/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../js/jquery-easyui-1.8.5/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../js/jquery-easyui-1.8.5/demo/demo.css">
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.5/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.5/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.5/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" th:inline="none">
+        $(function () {
+            var editIndex = undefined;
+
+            function endEditing() {
+                if (editIndex == undefined) {//当前没有编辑行
+                    return true
+                }
+                if ($('#orderIeDatagrid').datagrid('validateRow', editIndex)) {//当前编辑行验证通过
+                    $('#orderIeDatagrid').datagrid('endEdit', editIndex);
+                    editIndex = undefined;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            //Add
+            $('#orderIeDatagrid_add').bind('click', function () {
+                if (endEditing()) {
+                    $('#orderIeDatagrid').datagrid('appendRow', {});
+                    editIndex = $('#orderIeDatagrid').datagrid('getRows').length - 1;
+                    $('#orderIeDatagrid').datagrid('beginEdit', editIndex);
+                }
+            });
+            //Edit
+            $('#orderIeDatagrid_edit').bind('click', function () {
+                if (endEditing()) {
+                    var row = $('#orderIeDatagrid').datagrid('getSelected');
+                    if (row != null) {
+                        editIndex = $('#orderIeDatagrid').datagrid('getRowIndex', row);
+                        $('#orderIeDatagrid').datagrid('beginEdit', editIndex);
+                    }
+                }
+            });
+            //Cancel
+            $('#orderIeDatagrid_cancel').bind('click', function () {
+                if (endEditing()) {
+                    var row = $('#orderIeDatagrid').datagrid('getSelected');
+                    if (row != null) {
+                        var index = $('#orderIeDatagrid').datagrid('getRowIndex', row);
+                        $('#orderIeDatagrid').datagrid('deleteRow', index);
+                    }
+                }
+            });
+            //Save
+            $('#orderIeDatagrid_save').bind('click', function () {
+                if (endEditing()) {
+                    debugger
+                    var inserted = $("#orderIeDatagrid").datagrid('getChanges', 'inserted');
+                    var deleted = $("#orderIeDatagrid").datagrid('getChanges', 'deleted');
+                    var updated = $("#orderIeDatagrid").datagrid('getChanges', 'updated');
+                    $.messager.confirm('Confirm', (inserted.length == 0 ? '' : 'Add：' + inserted.length + '\n') + (deleted.length == 0 ? '' : 'Delete：' + deleted.length + '\n') + (updated.length == 0 ? '' : 'Update：' + updated.length + '\n'), function (r) {
+                        if (r) {
+                            var dataGrid = {};
+                            dataGrid.inserted = inserted;
+                            dataGrid.deleted = deleted;
+                            dataGrid.updated = updated;
+                            $.ajax({
+                                url: '/OrderCntrControl/save',
+                                contentType: "application/json",
+                                type: "POST",
+                                data: JSON.stringify(dataGrid),
+                                success: function (success) {
+                                    debugger
+                                    $.messager.show({
+                                        title: 'Success',
+                                        msg: '操作成功',
+                                        showType: 'show'
+                                    });
+                                    $('#orderIeDatagrid').datagrid('reload');
+                                },
+                                error: function (error) {
+                                    $.messager.show({
+                                        title: 'Error',
+                                        msg: error.responseText,
+                                        showType: 'show'
+                                    });
+                                }
+                            })
+                        }
+                    });
+                }
+            });
+            $('#orderIeDatagrid').datagrid({
+                url: '/OrderCntrControl/find',
+                sortName: 'orderIeNo',
+                sortOrder: 'asc',
+                toolbar: '#orderIeDatagrid_tb',
+                singleSelect: true,
+                onSelect: function (index, row) {
+                    $('#orderIeCntrDatagrid').datagrid('options').url = '/OrderCntrDetailControl/find';
+                    $('#orderIeCntrDatagrid').datagrid('load', {orderIeId: row.orderIeId});
+                },
+                columns: [[
+                    {
+                        field: 'ck',
+                        checkbox: true,
+                    },
+                    {
+                        field: 'orderNo',
+                        title: '预约号',
+                        align: 'center',
+                        editor: {type: 'validatebox', options: {required: true}}
+                    },
+                    {
+                        field: 'orderType',
+                        title: '预约类型',
+                        align: 'center',
+                        editor: {type: 'validatebox', options: {required: true}}
+                    },
+                    {
+                        field: 'orderIeDate',
+                        title: '预约日期',
+                        align: 'center',
+                        editor: {type: 'datebox', options: {required: true}}
+                    }
+                    ,
+                    {
+                        field: 'workWay',
+                        title: '作业方式',
+                        align: 'center',
+                        editor: {type: 'validatebox', options: {required: true}}
+                    }
+                    ,
+                    {
+                        field: 'taFalg',
+                        title: '收提标志',
+                        align: 'center',
+                        editor: {type: 'validatebox', options: {required: true}}
+                    }
+                    ,
+                    {
+                        field: 'billNo',
+                        title: '提单号',
+                        align: 'center',
+                        editor: {type: 'validatebox', options: {required: true}}
+                    },
+                    {
+                        field: 'creator',
+                        title: '创建人',
+                        align: 'center',
+                        width: 80
+                    }
+                    ,
+                    {
+                        field: 'createdTim',
+                        title: '创建时间',
+                        align: 'center',
+                        width: 170
+                    }
+                    ,
+                    {
+                        field: 'changer',
+                        title: '修改人',
+                        align: 'center',
+                        width: 80
+                    }
+                    ,
+                    {
+                        field: 'changedTim',
+                        title: '修改时间',
+                        align: 'center',
+                        width: 170
+                    }
+                ]],
+                rownumbers: true,
+                pageSize: 20,
+                pagination: true
+            });
+            var editIndex1 = undefined;
+
+            function endEditing1() {
+                if (editIndex1 == undefined) {//当前没有编辑行
+                    return true
+                }
+                if ($('#orderIeCntrDatagrid').datagrid('validateRow', editIndex1)) {//当前编辑行验证通过
+                    $('#orderIeCntrDatagrid').datagrid('endEdit', editIndex1);
+                    editIndex1 = undefined;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            //Add
+            $('#orderIeCntrDatagrid_add').bind('click', function () {
+                if (endEditing1()) {
+                    debugger
+                    var row = $('#orderIeDatagrid').datagrid('getSelected');
+                    if (row) {
+                        $('#orderIeCntrDatagrid').datagrid('appendRow', {orderIeId: row.orderIeId});
+                        editIndex1 = $('#orderIeCntrDatagrid').datagrid('getRows').length - 1;
+                        $('#orderIeCntrDatagrid').datagrid('beginEdit', editIndex1);
+                    } else {
+                        $.messager.alert('Alert', '请先选择一条预约');
+                        return;
+                    }
+                }
+            });
+            //Edit
+            $('#orderIeCntrDatagrid_edit').bind('click', function () {
+                if (endEditing1()) {
+                    var row = $('#orderIeCntrDatagrid').datagrid('getSelected');
+                    if (row != null) {
+                        editIndex1 = $('#orderIeCntrDatagrid').datagrid('getRowIndex', row);
+                        $('#orderIeCntrDatagrid').datagrid('beginEdit', editIndex1);
+                    }
+                }
+            });
+            //Cancel
+            $('#orderIeCntrDatagrid_cancel').bind('click', function () {
+                if (endEditing1()) {
+                    var row = $('#orderIeCntrDatagrid').datagrid('getSelected');
+                    if (row != null) {
+                        var index = $('#orderIeCntrDatagrid').datagrid('getRowIndex', row);
+                        $('#orderIeCntrDatagrid').datagrid('deleteRow', index);
+                    }
+                }
+            });
+            //Save
+            $('#orderIeCntrDatagrid_save').bind('click', function () {
+                if (endEditing1()) {
+                    debugger
+                    var inserted = $("#orderIeCntrDatagrid").datagrid('getChanges', 'inserted');
+                    var deleted = $("#orderIeCntrDatagrid").datagrid('getChanges', 'deleted');
+                    var updated = $("#orderIeCntrDatagrid").datagrid('getChanges', 'updated');
+                    $.messager.confirm('Confirm', (inserted.length == 0 ? '' : 'Add：' + inserted.length + '\n') + (deleted.length == 0 ? '' : 'Delete：' + deleted.length + '\n') + (updated.length == 0 ? '' : 'Update：' + updated.length + '\n'), function (r) {
+                        if (r) {
+                            var dataGrid = {};
+                            dataGrid.inserted = inserted;
+                            dataGrid.deleted = deleted;
+                            dataGrid.updated = updated;
+                            $.ajax({
+                                url: '/OrderCntrDetailControl/save',
+                                contentType: "application/json",
+                                type: "POST",
+                                data: JSON.stringify(dataGrid),
+                                success: function (success) {
+                                    debugger
+                                    $.messager.show({
+                                        title: 'Success',
+                                        msg: '操作成功',
+                                        showType: 'show'
+                                    });
+                                    $('#orderIeCntrDatagrid').datagrid('reload');
+                                },
+                                error: function (error) {
+                                    $.messager.show({
+                                        title: 'Error',
+                                        msg: error.responseText,
+                                        showType: 'show'
+                                    });
+                                }
+                            })
+                        }
+                    });
+                }
+            });
+            $('#orderIeCntrDatagrid').datagrid({
+                sortName: 'seqNo',
+                sortOrder: 'asc',
+                toolbar: '#orderIeCntrDatagrid_tb',
+                singleSelect: true,
+                columns: [[
+                    {
+                        field: 'ck',
+                        checkbox: true,
+                    },
+                    {
+                        field: 'orderIeCntrId',
+                        title: 'orderIeCntrId',
+                        align: 'center',
+                        hidden: true,
+                    },
+                    {
+                        field: 'orderIeId',
+                        title: '预约号',
+                        align: 'center',
+                        hidden: true,
+                    },
+                    {
+                        field: 'seqNo',
+                        title: '序号',
+                        align: 'center',
+                        editor: {type: 'validatebox',}
+                    },
+                    {
+                        field: 'cntrCoprId',
+                        title: '船公司号',
+                        align: 'center',
+                        editor: {type: 'validatebox',}
+                    }
+                    ,
+                    {
+                        field: 'cntr',
+                        title: '箱号',
+                        align: 'center',
+                        editor: {type: 'validatebox'}
+                    }
+                    ,
+                    {
+                        field: 'efFlag',
+                        title: '空重标志',
+                        align: 'center',
+                        editor: {type: 'validatebox'}
+                    }
+                    ,
+                    {
+                        field: 'cntrSize',
+                        title: '箱尺寸',
+                        align: 'center',
+                        editor: {type: 'validatebox'}
+                    }
+                    ,
+                    {
+                        field: 'cntrType',
+                        title: '箱类型',
+                        align: 'center',
+                        editor: {type: 'validatebox'}
+                    }
+                    ,
+                    {
+                        field: 'cntrIso',
+                        title: '箱ISO',
+                        align: 'center',
+                        editor: {type: 'validatebox'}
+                    }
+                    ,
+                    {
+                        field: 'tradeType',
+                        title: '贸易性质',
+                        align: 'center',
+                        editor: {type: 'validatebox'}
+                    }
+                    ,
+                    {
+                        field: 'cntrClass',
+                        title: '流向类别',
+                        align: 'center',
+                        editor: {type: 'validatebox'}
+                    }
+                    ,
+                    {
+                        field: 'reeferTemper',
+                        title: '冷藏温度',
+                        align: 'center',
+                        editor: {type: 'validatebox'}
+                    }
+                    ,
+                    {
+                        field: 'overFlag',
+                        title: '超限标志',
+                        align: 'center',
+                        editor: {type: 'validatebox'}
+                    }
+                    ,
+                    {
+                        field: 'demageId',
+                        title: '残损',
+                        align: 'center',
+                        editor: {type: 'validatebox'}
+                    }
+                    ,
+                    {
+                        field: 'sealNo',
+                        title: '铅封号',
+                        align: 'center',
+                        editor: {type: 'validatebox'}
+                    }
+                    ,
+                    {
+                        field: 'truckId',
+                        title: '卡车号',
+                        align: 'center',
+                        editor: {type: 'validatebox'}
+                    }
+                    ,
+                    {
+                        field: 'vgm',
+                        title: 'VGM',
+                        align: 'center',
+                        editor: {type: 'validatebox'}
+                    }
+                    ,
+                    {
+                        field: 'creator',
+                        title: '创建人',
+                        align: 'center',
+                        width: 80
+                    }
+                    ,
+                    {
+                        field: 'createdTim',
+                        title: '创建时间',
+                        align: 'center',
+                        width: 170
+                    }
+                    ,
+                    {
+                        field: 'changer',
+                        title: '修改人',
+                        align: 'center',
+                        width: 80
+                    }
+                    ,
+                    {
+                        field: 'changedTim',
+                        title: '修改时间',
+                        align: 'center',
+                        width: 170
+                    }
+                ]],
+                rownumbers: true,
+                pageSize: 20,
+                pagination: true
+            });
+        });
+    </script>
+</head>
+<body class="easyui-layout" style="width: 100%;height: 100%">
+<div data-options="region:'north',title:'预约',split:true" style="height:40%;">
+    <div id="orderIeDatagrid_tb">
+        <shiro:hasPermission name="orderIe:add"><a id="orderIeDatagrid_add" href="#" class="easyui-linkbutton"
+                                                   iconCls="icon-add"
+                                                   plain="true">Add</a></shiro:hasPermission>
+        <shiro:hasPermission name="orderIe:update"><a id="orderIeDatagrid_edit" href="#" class="easyui-linkbutton"
+                                                      iconCls="icon-edit"
+                                                      plain="true">Edit</a></shiro:hasPermission>
+        <shiro:hasPermission name="orderIe:delete"><a id="orderIeDatagrid_cancel" href="#" class="easyui-linkbutton"
+                                                      iconCls="icon-cancel"
+                                                      plain="true">Cancel</a></shiro:hasPermission>
+        <shiro:hasPermission name="orderIe:save"><a id="orderIeDatagrid_save" href="#" class="easyui-linkbutton"
+                                                    iconCls="icon-save"
+                                                    plain="true">Save</a></shiro:hasPermission>
+    </div>
+    <table id="orderIeDatagrid"></table>
+</div>
+<div data-options="region:'center',title:'预约明细'">
+    <div id="orderIeCntrDatagrid_tb">
+        <shiro:hasPermission name="orderIeCntr:add"><a id="orderIeCntrDatagrid_add" href="#"
+                                                       class="easyui-linkbutton"
+                                                       iconCls="icon-add"
+                                                       plain="true">Add</a></shiro:hasPermission>
+        <shiro:hasPermission name="orderIeCntr:update"><a id="orderIeCntrDatagrid_edit" href="#"
+                                                          class="easyui-linkbutton"
+                                                          iconCls="icon-edit"
+                                                          plain="true">Edit</a></shiro:hasPermission>
+        <shiro:hasPermission name="orderIeCntr:delete"><a id="orderIeCntrDatagrid_cancel" href="#"
+                                                          class="easyui-linkbutton"
+                                                          iconCls="icon-cancel"
+                                                          plain="true">Cancel</a></shiro:hasPermission>
+        <shiro:hasPermission name="orderIeCntr:save"><a id="orderIeCntrDatagrid_save" href="#"
+                                                        class="easyui-linkbutton"
+                                                        iconCls="icon-save"
+                                                        plain="true">Save</a></shiro:hasPermission>
+    </div>
+    <table id="orderIeCntrDatagrid"></table>
+</div>
+</body>
+</html>

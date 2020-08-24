@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>OrderCntr</title>
+    <link rel="stylesheet" type="text/css" href="../js/jquery-easyui-1.8.5/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../js/jquery-easyui-1.8.5/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../js/jquery-easyui-1.8.5/demo/demo.css">
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.5/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.5/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.5/locale/easyui-lang-zh_CN.js"></script>
+    <style type="text/css">
+        /*收箱*/
+        #flip_A, #gateTruckCntr_A1, #gateTruckCntr_A2 {
+            margin: 2px;
+            padding: 5px;
+            text-align: center;
+            background: #e5eecc;
+            border: solid 1px #c3c3c3;
+        }
+
+        /*收箱*/
+        #flip_T, #gateTruckCntr_T1, #gateTruckCntr_T2 {
+            margin: 2px;
+            padding: 5px;
+            text-align: center;
+            background: #E5CCEE;
+            border: solid 1px #c3c3c3;
+        }
+
+        label {
+            width: 60px;
+            display: inline-block;
+        }
+
+        input.easyui-textbox {
+            width: 80px;
+        }
+
+        .div_allinline {
+            text-align: center;
+            margin: 0 auto;
+            padding: 0;
+            clear: both;
+        }
+
+        .subdiv_allinline {
+            margin: 0;
+            padding: 0;
+            display: inline-block;
+            _display: inline;
+            *display: inline;
+            zoom: 1;
+        }
+    </style>
+    <script type="text/javascript" th:inline="none">
+        $(function () {
+            //收箱
+            $("#flip_A").click(function () {
+                $("#gateTruckCntr_A1").slideToggle("slow");
+                $("#gateTruckCntr_A2").slideToggle("slow");
+            });
+            //提箱
+            $("#flip_T").click(function () {
+                $("#gateTruckCntr_T1").slideToggle("slow");
+                $("#gateTruckCntr_T2").slideToggle("slow");
+            });
+        });
+    </script>
+</head>
+<body>
+<div style="margin:2px">
+    <form th:id="gateTruck_form">
+        <fieldset style="width:98%;">
+            <legend>集卡信息</legend>
+            <table>
+                <tr>
+                    <td><label>车牌号:</label><input class="easyui-textbox" name="truckId" data-options="required:true,"
+                    ></td>
+                    <td><label>托盘号:</label><input class="easyui-textbox" name="palletId"></td>
+                    <td><label>卡车毛重:</label><input class="easyui-numberbox" name="truckGrossWgt"
+                                                   data-options="min:0,precision:2"></td>
+                    <td><label>进闸口号:</label><input class="easyui-textbox" name="inGateId"></td>
+                    <td><label>进闸时间:</label><input class="easyui-datebox" name="inGateTime" style="width:110px;"></td>
+                    <td><label>出闸口号:</label><input class="easyui-textbox" name="outGateId"></td>
+                    <td><label>出闸时间:</label><input class="easyui-datebox" name="outGateTime" style="width:110px;"></td>
+                </tr>
+            </table>
+        </fieldset>
+    </form>
+</div>
+
+<fieldset style="width:98%;">
+    <legend>车载箱信息</legend>
+    <div class="div_allinline">
+        <p class="flip" th:id="flip_A">收箱</p>
+        <div class="subdiv_allinline" th:id="gateTruckCntr_A1" style="display:none;">
+            <form th:id="gateTruckCntr_form1">
+                <table>
+                    <tr>
+                        <td><label>委托号:</label><input class="easyui-textbox" name="orderCntrNo"
+                                                      data-options="required:true">
+                        </td>
+                        <td><label>提单号:</label><input class="easyui-textbox" name="billNo"></td>
+                        <td><label>序号:</label><input class="easyui-textbox" name="seqNo"></td>
+                    </tr>
+                    <tr>
+                        <td><label>箱号:</label><input class="easyui-textbox" name="cntr"></td>
+                        <td><label>收提标志:</label><input class="easyui-textbox" name="taFlag"></td>
+                        <td><label>船公司号:</label><input class="easyui-textbox" name="cntrCoprId">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>箱到场号:</label><input class="easyui-textbox" name="cntrId"></td>
+                        <td><label>箱号:</label><input class="easyui-textbox" name="cntr"></td>
+                        <td><label>箱尺寸:</label><input class="easyui-textbox" name="efFlag"></td>
+                    </tr>
+                    <tr>
+                        <td><label>箱类型:</label><input class="easyui-textbox" name="efFlag"></td>
+                        <td><label>箱ISO:</label><input class="easyui-textbox" name="efFlag"></td>
+                        <td><label>空重标志:</label><input class="easyui-textbox" name="efFlag"></td>
+                    </tr>
+                    <tr>
+                        <td><label>贸易性质:</label><input class="easyui-textbox" name="tradeType"></td>
+                        <td><label>流向类别:</label><input class="easyui-textbox" name="cntrClass"></td>
+                        <td><label>冷藏温度:</label><input class="easyui-textbox" name="reeferTemper">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>铅封号:</label><input class="easyui-textbox" name="sealNo"></td>
+
+                        <td><label>残损:</label><input class="easyui-textbox" name="damageId"></td>
+                        <td><label>超限标志:</label><input class="easyui-textbox" name="overFlag"></td>
+                    </tr>
+                    <tr>
+                        <td><label>箱毛重:</label><input class="easyui-textbox" name="cntrGrossWgt">
+                        </td>
+                        <td><label>箱皮重:</label><input class="easyui-textbox" name="cntrNetWgt"></td>
+                        <td><label>货重:</label><input class="easyui-textbox" name="cargoWgt"></td>
+                    </tr>
+                    <tr>
+                        <td><label>货数量:</label><input class="easyui-textbox" name="cargoNumber">
+                        </td>
+                        <td><label>货体积:</label><input class="easyui-textbox" name="cargoVolume">
+                        </td>
+                        <td><label>VGM:</label><input class="easyui-textbox" name="vgm"></td>
+                    </tr>
+                    <tr>
+                        <td><label>船舶艘次:</label><input class="easyui-textbox" name="shipVoyage">
+                        </td>
+                        <td><label>在车位置:</label><input class="easyui-textbox" name="posOnTruck">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="subdiv_allinline" th:id="gateTruckCntr_A2" style="display:none;">
+            <form th:id="gateTruckCntr_form2">
+                <table>
+                    <tr>
+                        <td><label>委托号:</label><input class="easyui-textbox" name="orderCntrNo"
+                                                      data-options="required:true">
+                        </td>
+                        <td><label>提单号:</label><input class="easyui-textbox" name="billNo"></td>
+                        <td><label>序号:</label><input class="easyui-textbox" name="seqNo"></td>
+                    </tr>
+                    <tr>
+                        <td><label>箱号:</label><input class="easyui-textbox" name="cntr"></td>
+                        <td><label>收提标志:</label><input class="easyui-textbox" name="taFlag"></td>
+                        <td><label>船公司号:</label><input class="easyui-textbox" name="cntrCoprId">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>箱到场号:</label><input class="easyui-textbox" name="cntrId"></td>
+                        <td><label>箱号:</label><input class="easyui-textbox" name="cntr"></td>
+                        <td><label>箱尺寸:</label><input class="easyui-textbox" name="efFlag"></td>
+                    </tr>
+                    <tr>
+                        <td><label>箱类型:</label><input class="easyui-textbox" name="efFlag"></td>
+                        <td><label>箱ISO:</label><input class="easyui-textbox" name="efFlag"></td>
+                        <td><label>空重标志:</label><input class="easyui-textbox" name="efFlag"></td>
+                    </tr>
+                    <tr>
+                        <td><label>贸易性质:</label><input class="easyui-textbox" name="tradeType"></td>
+                        <td><label>流向类别:</label><input class="easyui-textbox" name="cntrClass"></td>
+                        <td><label>冷藏温度:</label><input class="easyui-textbox" name="reeferTemper">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>铅封号:</label><input class="easyui-textbox" name="sealNo"></td>
+
+                        <td><label>残损:</label><input class="easyui-textbox" name="damageId"></td>
+                        <td><label>超限标志:</label><input class="easyui-textbox" name="overFlag"></td>
+                    </tr>
+                    <tr>
+                        <td><label>箱毛重:</label><input class="easyui-textbox" name="cntrGrossWgt">
+                        </td>
+                        <td><label>箱皮重:</label><input class="easyui-textbox" name="cntrNetWgt"></td>
+                        <td><label>货重:</label><input class="easyui-textbox" name="cargoWgt"></td>
+                    </tr>
+                    <tr>
+                        <td><label>货数量:</label><input class="easyui-textbox" name="cargoNumber">
+                        </td>
+                        <td><label>货体积:</label><input class="easyui-textbox" name="cargoVolume">
+                        </td>
+                        <td><label>VGM:</label><input class="easyui-textbox" name="vgm"></td>
+                    </tr>
+                    <tr>
+                        <td><label>船舶艘次:</label><input class="easyui-textbox" name="shipVoyage">
+                        </td>
+                        <td><label>在车位置:</label><input class="easyui-textbox" name="posOnTruck">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div class="div_allinline">
+        <p class="flip" th:id="flip_T">提箱</p>
+        <div class="subdiv_allinline" th:id="gateTruckCntr_T1" style="display:none;">
+            <form th:id="gateTruckCntr_form1">
+                <table>
+                    <tr>
+                        <td><label>委托号:</label><input class="easyui-textbox" name="orderCntrNo"
+                                                      data-options="required:true">
+                        </td>
+                        <td><label>提单号:</label><input class="easyui-textbox" name="billNo"></td>
+                        <td><label>序号:</label><input class="easyui-textbox" name="seqNo"></td>
+                    </tr>
+                    <tr>
+                        <td><label>箱号:</label><input class="easyui-textbox" name="cntr"></td>
+                        <td><label>收提标志:</label><input class="easyui-textbox" name="taFlag"></td>
+                        <td><label>船公司号:</label><input class="easyui-textbox" name="cntrCoprId">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>箱到场号:</label><input class="easyui-textbox" name="cntrId"></td>
+                        <td><label>箱号:</label><input class="easyui-textbox" name="cntr"></td>
+                        <td><label>箱尺寸:</label><input class="easyui-textbox" name="efFlag"></td>
+                    </tr>
+                    <tr>
+                        <td><label>箱类型:</label><input class="easyui-textbox" name="efFlag"></td>
+                        <td><label>箱ISO:</label><input class="easyui-textbox" name="efFlag"></td>
+                        <td><label>空重标志:</label><input class="easyui-textbox" name="efFlag"></td>
+                    </tr>
+                    <tr>
+                        <td><label>贸易性质:</label><input class="easyui-textbox" name="tradeType"></td>
+                        <td><label>流向类别:</label><input class="easyui-textbox" name="cntrClass"></td>
+                        <td><label>冷藏温度:</label><input class="easyui-textbox" name="reeferTemper">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>铅封号:</label><input class="easyui-textbox" name="sealNo"></td>
+
+                        <td><label>残损:</label><input class="easyui-textbox" name="damageId"></td>
+                        <td><label>超限标志:</label><input class="easyui-textbox" name="overFlag"></td>
+                    </tr>
+                    <tr>
+                        <td><label>箱毛重:</label><input class="easyui-textbox" name="cntrGrossWgt">
+                        </td>
+                        <td><label>箱皮重:</label><input class="easyui-textbox" name="cntrNetWgt"></td>
+                        <td><label>货重:</label><input class="easyui-textbox" name="cargoWgt"></td>
+                    </tr>
+                    <tr>
+                        <td><label>货数量:</label><input class="easyui-textbox" name="cargoNumber">
+                        </td>
+                        <td><label>货体积:</label><input class="easyui-textbox" name="cargoVolume">
+                        </td>
+                        <td><label>VGM:</label><input class="easyui-textbox" name="vgm"></td>
+                    </tr>
+                    <tr>
+                        <td><label>船舶艘次:</label><input class="easyui-textbox" name="shipVoyage">
+                        </td>
+                        <td><label>在车位置:</label><input class="easyui-textbox" name="posOnTruck">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="subdiv_allinline" th:id="gateTruckCntr_T2" style="display:none;">
+            <form th:id="gateTruckCntr_form2">
+                <table>
+                    <tr>
+                        <td><label>委托号:</label><input class="easyui-textbox" name="orderCntrNo"
+                                                      data-options="required:true">
+                        </td>
+                        <td><label>提单号:</label><input class="easyui-textbox" name="billNo"></td>
+                        <td><label>序号:</label><input class="easyui-textbox" name="seqNo"></td>
+                    </tr>
+                    <tr>
+                        <td><label>箱号:</label><input class="easyui-textbox" name="cntr"></td>
+                        <td><label>收提标志:</label><input class="easyui-textbox" name="taFlag"></td>
+                        <td><label>船公司号:</label><input class="easyui-textbox" name="cntrCoprId">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>箱到场号:</label><input class="easyui-textbox" name="cntrId"></td>
+                        <td><label>箱号:</label><input class="easyui-textbox" name="cntr"></td>
+                        <td><label>箱尺寸:</label><input class="easyui-textbox" name="efFlag"></td>
+                    </tr>
+                    <tr>
+                        <td><label>箱类型:</label><input class="easyui-textbox" name="efFlag"></td>
+                        <td><label>箱ISO:</label><input class="easyui-textbox" name="efFlag"></td>
+                        <td><label>空重标志:</label><input class="easyui-textbox" name="efFlag"></td>
+                    </tr>
+                    <tr>
+                        <td><label>贸易性质:</label><input class="easyui-textbox" name="tradeType"></td>
+                        <td><label>流向类别:</label><input class="easyui-textbox" name="cntrClass"></td>
+                        <td><label>冷藏温度:</label><input class="easyui-textbox" name="reeferTemper">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>铅封号:</label><input class="easyui-textbox" name="sealNo"></td>
+
+                        <td><label>残损:</label><input class="easyui-textbox" name="damageId"></td>
+                        <td><label>超限标志:</label><input class="easyui-textbox" name="overFlag"></td>
+                    </tr>
+                    <tr>
+                        <td><label>箱毛重:</label><input class="easyui-textbox" name="cntrGrossWgt">
+                        </td>
+                        <td><label>箱皮重:</label><input class="easyui-textbox" name="cntrNetWgt"></td>
+                        <td><label>货重:</label><input class="easyui-textbox" name="cargoWgt"></td>
+                    </tr>
+                    <tr>
+                        <td><label>货数量:</label><input class="easyui-textbox" name="cargoNumber">
+                        </td>
+                        <td><label>货体积:</label><input class="easyui-textbox" name="cargoVolume">
+                        </td>
+                        <td><label>VGM:</label><input class="easyui-textbox" name="vgm"></td>
+                    </tr>
+                    <tr>
+                        <td><label>船舶艘次:</label><input class="easyui-textbox" name="shipVoyage">
+                        </td>
+                        <td><label>在车位置:</label><input class="easyui-textbox" name="posOnTruck">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+</fieldset>
+</body>
+</html>
